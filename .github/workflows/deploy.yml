@@ -25,12 +25,6 @@ jobs:
 
       - name: Build step
         run: "deno task build"
-        env:
-          R2_BUCKET_NAME: ${{ secrets.R2_BUCKET_NAME }}
-          R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
-          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
-          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
-          SUBDOMAIN: ${{ secrets.SUBDOMAIN }}
 
       - name: Upload to Deno Deploy
         uses: denoland/deployctl@v1
@@ -38,9 +32,5 @@ jobs:
           project: "johannessch-neues2020-54"
           entrypoint: "main.ts"
           root: "."
-          env: |
-            R2_BUCKET_NAME=${{ secrets.R2_BUCKET_NAME }}
-            R2_ENDPOINT=${{ secrets.R2_ENDPOINT }}
-            R2_ACCESS_KEY_ID=${{ secrets.R2_ACCESS_KEY_ID }}
-            R2_SECRET_ACCESS_KEY=${{ secrets.R2_SECRET_ACCESS_KEY }}
-            SUBDOMAIN=${{ secrets.SUBDOMAIN }}
+          
+          
