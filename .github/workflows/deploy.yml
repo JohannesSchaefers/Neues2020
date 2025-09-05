@@ -43,8 +43,4 @@ jobs:
             R2_ENDPOINT=${{ secrets.R2_ENDPOINT }}
             R2_ACCESS_KEY_ID=${{ secrets.R2_ACCESS_KEY_ID }}
             R2_SECRET_ACCESS_KEY=${{ secrets.R2_SECRET_ACCESS_KEY }}
-<<<<<<< HEAD
             SUBDOMAIN=${{ secrets.SUBDOMAIN }}
-=======
-            SUBDOMAIN=${{ secrets.SUBDOMAIN }}
->>>>>>> 1a04364a977dcdafb300e7291a5ea716354c2b8f
