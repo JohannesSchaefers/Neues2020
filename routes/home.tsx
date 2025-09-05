@@ -134,7 +134,7 @@ export default function Home({ data }: PageProps<Data>) {
     <div class="p-4 mx-auto max-w-screen-md">
       <h1 class="text-2xl font-bold">PDF-Dateien</h1>
       {files.length === 0 ? (
-        <p>Keine PDF-Dateien gefunden.</p>
+        <p>Keine PDF-Dateien gefunden!!</p>
       ) : (
         <ul class="mt-4">
           {files.map((file) => (
