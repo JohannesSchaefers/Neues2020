@@ -29,6 +29,8 @@ jobs:
       - name: Upload to Deno Deploy
         uses: denoland/deployctl@v1
         with:
-          project: "johannessch-neues2020-54"
-          entrypoint: "dev.ts"
+          project: "johannessch-neues2020-60"
+          entrypoint: "main.ts"
           root: "."
+          
+          
