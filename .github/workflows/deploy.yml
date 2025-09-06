@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     permissions:
-      id-token: write # Needed for auth with Deno Deploy Say it again
+      id-token: write # Needed for auth with Deno Deploy
       contents: read # Needed to clone the repository
 
     steps:
@@ -29,12 +29,6 @@ jobs:
       - name: Upload to Deno Deploy
         uses: denoland/deployctl@v1
         with:
-project: "johannessch-neues2020-54"
-entrypoint: "dev.ts"
-root: "."
-env: |
-  R2_BUCKET_NAME=${{ secrets.R2_BUCKET_NAME }}
-  R2_ENDPOINT=${{ secrets.R2_ENDPOINT }}
-  R2_ACCESS_KEY_ID=${{ secrets.R2_ACCESS_KEY_ID }}
-  R2_SECRET_ACCESS_KEY=${{ secrets.R2_SECRET_ACCESS_KEY }}
-  SUBDOMAIN=${{ secrets.SUBDOMAIN }}
+          project: "johannessch-neues2020-54"
+          entrypoint: "dev.ts"
+          root: "."
