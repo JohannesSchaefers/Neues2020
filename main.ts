@@ -13,24 +13,24 @@ const endpoint = Deno.env.get("R2_ENDPOINT");
 const bucketName = Deno.env.get("R2_BUCKET_NAME");
 
 // Debugging: log raw environment values
-console.log("R2_ACCESS_KEY_ID (raw):", accessKeyId);
-console.log("R2_SECRET_ACCESS_KEY (raw):", secretAccessKey);
-console.log("R2_ENDPOINT (raw):", endpoint);
-console.log("R2_BUCKET_NAME (raw):", bucketName);
+//console.log("R2_ACCESS_KEY_ID (raw):", accessKeyId);
+//console.log("R2_SECRET_ACCESS_KEY (raw):", secretAccessKey);
+//console.log("R2_ENDPOINT (raw):", endpoint);
+//console.log("R2_BUCKET_NAME (raw):", bucketName);
 
 // Check if environment variables are valid
-function checkEnvVar(variable: string | undefined, name: string): void {
-  if (!variable?.trim()) {
-    console.error(`Fehler: ${name} ist nicht gesetzt oder leer`);
-    throw new Error(`${name} fehlt`);
-  }
-}
+//function checkEnvVar(variable: string | undefined, name: string): void {
+//  if (!variable?.trim()) {
+//    console.error(`Fehler: ${name} ist nicht gesetzt oder leer`);
+//    throw new Error(`${name} fehlt`);
+//  }
+//}
 
 // Validate environment variables
-checkEnvVar(accessKeyId, "R2_ACCESS_KEY_ID");
-checkEnvVar(secretAccessKey, "R2_SECRET_ACCESS_KEY");
-checkEnvVar(endpoint, "R2_ENDPOINT");
-checkEnvVar(bucketName, "R2_BUCKET_NAME");
+//checkEnvVar(accessKeyId, "R2_ACCESS_KEY_ID");
+//checkEnvVar(secretAccessKey, "R2_SECRET_ACCESS_KEY");
+//checkEnvVar(endpoint, "R2_ENDPOINT");
+//checkEnvVar(bucketName, "R2_BUCKET_NAME");
 
 // Initialize S3Client with credentials and endpoint
 const s3Client = new S3Client({
@@ -61,9 +61,9 @@ await listBuckets();
 
 // Function to list PDF files in a given bucket
 export async function listPDFFiles(bucketName: string): Promise<string[]> {
-  console.log("R2_ENDPOINT:", endpoint);
-  console.log("R2_BUCKET_NAME:", bucketName);
-  console.log("R2_ACCESS_KEY_ID:", accessKeyId);
+  //console.log("R2_ENDPOINT:", endpoint);
+  //console.log("R2_BUCKET_NAME:", bucketName);
+  //console.log("R2_ACCESS_KEY_ID:", accessKeyId);
 
   try {
     const command = new ListObjectsV2Command({ Bucket: bucketName });
