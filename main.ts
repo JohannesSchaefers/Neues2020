@@ -1,12 +1,12 @@
-// Load .env only when running locally (not on Deno Deploy)
+// ==========================
+// main.ts — Deploy-safe version
+// ==========================
+
+// Detect if running on Deno Deploy
 const isInDeploy = Deno.env.get("DENO_DEPLOYMENT_ID") !== undefined;
-const isInCI = Deno.env.get("CI") === "true"; // GitHub Actions sets CI=true
 
+// Local startup check for required env vars (skipped on Deploy)
 if (!isInDeploy) {
-  // Local / CI only
-  await import("https://deno.land/std@0.224.0/dotenv/load.ts");
-
-  // Safe startup check for required env vars
   const requiredVars = [
     "R2_ACCESS_KEY_ID",
     "R2_SECRET_ACCESS_KEY",
@@ -30,13 +30,17 @@ if (!isInDeploy) {
   }
 }
 
-// === Fetch env vars for runtime ===
+// ==========================
+// Fetch environment variables
+// ==========================
 const accessKeyId = Deno.env.get("R2_ACCESS_KEY_ID")!;
 const secretAccessKey = Deno.env.get("R2_SECRET_ACCESS_KEY")!;
 const endpoint = Deno.env.get("R2_ENDPOINT")!;
 const bucketName = Deno.env.get("R2_BUCKET_NAME")!;
 
-// === Initialize S3 Client ===
+// ==========================
+// Initialize S3 Client
+// ==========================
 import { S3Client, ListObjectsV2Command, _Object as ObjectSummary } from "npm:@aws-sdk/client-s3";
 
 const s3Client = new S3Client({
@@ -50,7 +54,9 @@ const s3Client = new S3Client({
 
 console.log("✅ S3 Client successfully initialized.");
 
-// === Function to list PDF files ===
+// ==========================
+// List PDF files in bucket
+// ==========================
 export async function listPDFFiles(bucketName: string): Promise<string[]> {
   try {
     const command = new ListObjectsV2Command({ Bucket: bucketName });
@@ -63,14 +69,15 @@ export async function listPDFFiles(bucketName: string): Promise<string[]> {
     console.log("📂 Bucket contents:", files);
     return files;
   } catch (error) {
-    console.error("❌ Fehler beim Abrufen der Dateien aus R2:", error);
+    console.error("❌ Error fetching files from R2:", error);
     throw error;
   }
 }
 
-// === Test run when executed directly ===
+// ==========================
+// Test run when executed directly
+// ==========================
 if (import.meta.main) {
-  const bucketToUse = bucketName;
-  const pdfs = await listPDFFiles(bucketToUse);
+  const pdfs = await listPDFFiles(bucketName);
   console.log("Found PDFs:", pdfs);
 }
