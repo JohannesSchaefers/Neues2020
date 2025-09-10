@@ -1,4 +1,11 @@
-import "https://deno.land/std/dotenv/load.ts"
+if (Deno.env.get("DENO_DEPLOYMENT_ID") === undefined) {
+  // We're running locally (not on Deno Deploy)
+  await import("https://deno.land/std@0.224.0/dotenv/load.ts");
+}
+
+
+
+
 
 /// <reference no-default-lib="true" />
 /// <reference lib="dom" />
@@ -28,11 +35,14 @@ function checkEnvVar(variable: string | undefined, name: string): void {
   }
 }
 
-// Validate environment variables
-checkEnvVar(accessKeyId, "R2_ACCESS_KEY_ID");
-checkEnvVar(secretAccessKey, "R2_SECRET_ACCESS_KEY");
-checkEnvVar(endpoint, "R2_ENDPOINT");
-checkEnvVar(bucketName, "R2_BUCKET_NAME");
+const isInCI = Deno.env.get("CI") === "true"; // GitHub Actions sets CI=true
+
+if (!isInCI) {
+  checkEnvVar(accessKeyId, "R2_ACCESS_KEY_ID");
+  checkEnvVar(secretAccessKey, "R2_SECRET_ACCESS_KEY");
+  checkEnvVar(endpoint, "R2_ENDPOINT");
+  checkEnvVar(bucketName, "R2_BUCKET_NAME");
+}
 
 // Initialize S3Client with credentials and endpoint
 const s3Client = new S3Client({
