@@ -1,94 +1,70 @@
+// Load .env only when running locally (not on Deno Deploy)
 if (Deno.env.get("DENO_DEPLOYMENT_ID") === undefined) {
-  // We're running locally (not on Deno Deploy)
   await import("https://deno.land/std@0.224.0/dotenv/load.ts");
 }
 
+import {
+  S3Client,
+  ListObjectsV2Command,
+  _Object as ObjectSummary,
+} from "npm:@aws-sdk/client-s3";
 
-
-
-
-/// <reference no-default-lib="true" />
-/// <reference lib="dom" />
-/// <reference lib="dom.iterable" />
-/// <reference lib="dom.asynciterable" />
-/// <reference lib="deno.ns" />
-
-import { S3Client, ListObjectsV2Command, ListBucketsCommand, _Object as ObjectSummary } from "@aws-sdk/client-s3";
-
-// Fetch environment variables directly with Deno.env.get
+// === Environment Variables ===
 const accessKeyId = Deno.env.get("R2_ACCESS_KEY_ID");
 const secretAccessKey = Deno.env.get("R2_SECRET_ACCESS_KEY");
 const endpoint = Deno.env.get("R2_ENDPOINT");
 const bucketName = Deno.env.get("R2_BUCKET_NAME");
 
-// Debugging: log raw environment values
-console.log("R2_ACCESS_KEY_ID (raw):", accessKeyId);
-console.log("R2_SECRET_ACCESS_KEY (raw):", secretAccessKey);
-console.log("R2_ENDPOINT (raw):", endpoint);
-console.log("R2_BUCKET_NAME (raw):", bucketName);
-
-// Check if environment variables are valid
-function checkEnvVar(variable: string | undefined, name: string): void {
-  if (!variable?.trim()) {
-    console.error(`Fehler: ${name} ist nicht gesetzt oder leer`);
-    throw new Error(`${name} fehlt`);
+// === Safe Startup Check ===
+const requiredVars = ["R2_ACCESS_KEY_ID", "R2_SECRET_ACCESS_KEY", "R2_ENDPOINT", "R2_BUCKET_NAME"];
+let missingVars = false;
+for (const name of requiredVars) {
+  if (!Deno.env.get(name)) {
+    console.error(`❌ Missing env variable: ${name}`);
+    missingVars = true;
+  } else {
+    console.log(`✅ Found env variable: ${name}`);
   }
 }
 
-const isInCI = Deno.env.get("CI") === "true"; // GitHub Actions sets CI=true
-
-if (!isInCI) {
-  checkEnvVar(accessKeyId, "R2_ACCESS_KEY_ID");
-  checkEnvVar(secretAccessKey, "R2_SECRET_ACCESS_KEY");
-  checkEnvVar(endpoint, "R2_ENDPOINT");
-  checkEnvVar(bucketName, "R2_BUCKET_NAME");
+if (missingVars) {
+  console.error("❌ One or more required environment variables are missing. Exiting.");
+  Deno.exit(1);
 }
 
-// Initialize S3Client with credentials and endpoint
+// === Initialize S3 Client ===
 const s3Client = new S3Client({
   region: "auto",
-  endpoint: endpoint,
+  endpoint,
   credentials: {
     accessKeyId: accessKeyId!,
     secretAccessKey: secretAccessKey!,
   },
 });
 
-// Log S3 client initialization
-console.log("S3 Client successfully initialized.");
+console.log("✅ S3 Client successfully initialized.");
 
-// Example: List all available buckets
-async function listBuckets() {
-  try {
-    const command = new ListBucketsCommand({});
-    const response = await s3Client.send(command);
-    console.log("Buckets:", response.Buckets?.map((bucket) => bucket.Name));
-  } catch (error) {
-    console.error("Error listing buckets:", error);
-  }
-}
-
-// Call the listBuckets function to test
-await listBuckets();
-
-// Function to list PDF files in a given bucket
+// === List PDF Files in Bucket ===
 export async function listPDFFiles(bucketName: string): Promise<string[]> {
-  console.log("R2_ENDPOINT:", endpoint);
-  console.log("R2_BUCKET_NAME:", bucketName);
-  console.log("R2_ACCESS_KEY_ID:", accessKeyId);
-
   try {
     const command = new ListObjectsV2Command({ Bucket: bucketName });
     const response = await s3Client.send(command);
-    console.log("Bucket-Inhalt:", response.Contents?.map(obj => obj.Key) || []);
 
-    return (
-      response.Contents?.filter((obj: ObjectSummary) =>
-        obj.Key && obj.Key.endsWith(".pdf")
-      ).map((obj: ObjectSummary) => obj.Key!) || []
-    );
+    const files = response.Contents?.filter((obj: ObjectSummary) =>
+      obj.Key?.endsWith(".pdf")
+    ).map((obj) => obj.Key!) || [];
+
+    console.log("📂 Bucket contents:", files);
+    return files;
   } catch (error) {
-    console.error("Fehler beim Abrufen der Dateien aus R2:", error);
+    console.error("❌ Fehler beim Abrufen der Dateien aus R2:", error);
     throw error;
   }
+}
+
+// === Test run when executed directly ===
+if (import.meta.main) {
+  const bucketToUse = bucketName!;
+  const pdfs = await listPDFFiles(bucketToUse);
+  console.log("Found PDFs:", pdfs);
 }
