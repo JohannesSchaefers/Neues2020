@@ -25,7 +25,7 @@ export const handler: Handlers = {
       status: 303,
       headers: {
         "Location": "/home",
-        "Set-Cookie": `session=1; HttpOnly; Path=/; SameSite=Lax; Max-Age=3600; Secure=${
+        "Set-Cookie": `session=1; HttpOnly; Path=/; SameSite=Lax; Max-Age=30; Secure=${
           Deno.env.get("DENO_DEPLOY") === "true"
         }`,
       },
